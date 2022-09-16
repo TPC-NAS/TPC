@@ -1,8 +1,3 @@
-'''
-Copyright (C) 2010-2021 Alibaba Group Holding Limited.
-'''
-
-
 import os
 import distutils.dir_util
 import pprint, ast, argparse, logging

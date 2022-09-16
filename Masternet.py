@@ -1,7 +1,3 @@
-'''
-Copyright (C) 2010-2021 Alibaba Group Holding Limited.
-'''
-
 import os, sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -53,25 +49,26 @@ class MasterNet(PlainNet.PlainNet):
             else:
                 use_se = False
 
+        self.dataset = opt.dataset
+
         # print(no_reslink)
         super().__init__(argv=argv, opt=opt, num_classes=num_classes, plainnet_struct=plainnet_struct,
                                        no_create=no_create, no_reslink=no_reslink, no_BN=no_BN, use_se=use_se)
         self.last_channels = self.block_list[-1].out_channels
 
-        self.fc_linear_1 = basic_blocks.Linear(in_channels=self.last_channels, out_channels=1280, no_create=no_create)
-        self.bn1 = nn.BatchNorm1d(1280)
-        self.hs1 = hswish()
-        self.dropout = nn.Dropout(0.2)
-        self.fc_linear_2 = basic_blocks.Linear(in_channels=1280, out_channels=self.num_classes, no_create=no_create)
-
-        self.fc_linear = basic_blocks.Linear(in_channels=self.last_channels, out_channels=self.num_classes, no_create=no_create)
+        if self.dataset in ['imagenet', 'myimagenet100']:
+            self.fc_linear_1 = basic_blocks.Linear(in_channels=self.last_channels, out_channels=1280, no_create=no_create)
+            self.bn1 = nn.BatchNorm1d(1280)
+            self.hs1 = hswish()
+            self.dropout = nn.Dropout(0.2)
+            self.fc_linear_2 = basic_blocks.Linear(in_channels=1280, out_channels=self.num_classes, no_create=no_create)
+        else:
+            self.fc_linear = basic_blocks.Linear(in_channels=self.last_channels, out_channels=self.num_classes, no_create=no_create)
 
         self.no_create = no_create
         self.no_reslink = no_reslink
         self.no_BN = no_BN
         self.use_se = use_se
-
-        self.dataset = opt.dataset
 
         # bn eps
         for layer in self.modules():
@@ -96,7 +93,7 @@ class MasterNet(PlainNet.PlainNet):
         output = torch.flatten(output, 1)
 
         if self.dataset in ['imagenet', 'myimagenet100']:
-            output = self.dropout(self.hs1(self.fc_linear_1(output)))
+            output = self.dropout(self.hs1(self.bn1(self.fc_linear_1(output))))
             logit = self.fc_linear_2(output)
         else:
             logit = self.fc_linear(output)
@@ -110,8 +107,6 @@ class MasterNet(PlainNet.PlainNet):
         output = F.adaptive_avg_pool2d(output, output_size=1)
 
         output = torch.flatten(output, 1)
-        # output = self.dropout(self.hs1(self.fc_linear_1(output)))
-        # output = self.fc_linear_2(output)
 
         if self.dataset in ['imagenet', 'myimagenet100']:
             output = self.dropout(self.hs1(self.fc_linear_1(output)))
