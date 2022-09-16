@@ -1,7 +1,3 @@
-'''
-Copyright (C) 2010-2021 Alibaba Group Holding Limited.
-'''
-
 import os, sys, copy, time, logging, argparse
 
 import torch
