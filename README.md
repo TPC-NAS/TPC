@@ -11,6 +11,11 @@ https://drive.google.com/file/d/11RKw76fqSgtKMYrD-nqMC7LIUA28lwL9/view?usp=shari
 
 Change the data path in DataLoader
 
+# Other Applications
+super resolution: https://github.com/TPC-NAS/TPC_NAS_super_resolution
+object detection: https://github.com/TPC-NAS/TPC_NAS_Object_Detection
+natural language processing: https://github.com/TPC-NAS/TPC_NAS_Natural_Language_Model
+
 ## Testing
 Test CIFAR10 and CIFAR100
 ```
